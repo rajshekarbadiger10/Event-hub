@@ -1,0 +1,20 @@
+{
+  "name": "eventhub",
+  "private": true,
+  "version": "0.1.0",
+  "description": "EventHub — MERN Event Services Booking Platform",
+  "scripts": {
+    "dev": "concurrently -n client,server -c blue,green \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build": "npm run build --prefix client",
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f mongodb",
+    "docker:reset": "docker compose down -v"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
