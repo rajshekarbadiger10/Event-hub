@@ -16,7 +16,9 @@ router.use(authLimiter)
 router.post('/register', validate(registerSchema), authController.register)
 router.post('/login', validate(loginSchema), authController.login)
 router.post('/refresh', validate(refreshTokenSchema), authController.refresh)
+// Protected routes — authenticate reads Bearer JWT and sets req.user
 router.post('/logout', authenticate, authController.logout)
 router.get('/me', authenticate, authController.getMe)
+// Future: router.get('/bookings', authenticate, authorize(USER_ROLES.CUSTOMER), ...)
 
 export default router

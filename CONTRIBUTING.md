@@ -80,7 +80,7 @@ Data is stored in the Docker volume `eventhub_mongo_data` so restarts keep your 
 
 ### Auth & roles
 
-Roles: `customer` | `vendor` | `admin`
+Roles: `customer` | `vendor` | `admin` 
 
 - Customers and vendors self-register via `POST /api/v1/auth/register`
 - Admin accounts must be created via seed script (not self-registration)

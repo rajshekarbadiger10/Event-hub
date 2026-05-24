@@ -11,6 +11,13 @@ const roleDashboardPath: Record<UserRole, string> = {
   [USER_ROLES.ADMIN]: '/admin/dashboard',
 }
 
+const isSafeRedirect = (path?: string) =>
+  Boolean(
+    path?.startsWith('/') &&
+      !path.startsWith('/login') &&
+      !path.startsWith('/register'),
+  )
+
 export const useAuth = () => {
   const navigate = useNavigate()
   const { user, isAuthenticated, setAuth, clearAuth } = useAuthStore()
@@ -23,12 +30,16 @@ export const useAuth = () => {
   )
 
   const login = useCallback(
-    async (payload: ILoginPayload) => {
+    async (payload: ILoginPayload, returnTo?: string) => {
       const { user: loggedInUser, tokens } = await authService.login(payload)
       setAuth(loggedInUser, tokens)
-      redirectByRole(loggedInUser.role)
+      if (isSafeRedirect(returnTo)) {
+        navigate(returnTo!, { replace: true })
+      } else {
+        redirectByRole(loggedInUser.role)
+      }
     },
-    [setAuth, redirectByRole],
+    [setAuth, redirectByRole, navigate],
   )
 
   const register = useCallback(

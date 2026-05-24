@@ -6,6 +6,7 @@ import type {
   IUserPublic,
 } from '@eventhub/shared'
 import { apiClient } from '@/lib/api/client'
+import { refreshSession } from '@/lib/api/refreshSession'
 
 type AuthData = IAuthResponse
 
@@ -25,6 +26,8 @@ export const authService = {
     )
     return data.data
   },
+
+  refresh: async (refreshToken: string) => refreshSession(refreshToken),
 
   logout: async () => {
     await apiClient.post('/auth/logout')

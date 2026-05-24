@@ -4,33 +4,13 @@ import { authService } from '@/services/auth/auth.service'
 import { useAuthStore } from '@/store/slices/authStore'
 
 export function AppProviders({ children }: { children: ReactNode }) {
-  const { tokens, setUser, clearAuth, isHydrated, setHydrated } = useAuthStore()
+  const { tokens, setUser, clearAuth, isHydrated } = useAuthStore()
 
   useEffect(() => {
-    if (!isHydrated) return
+    if (!isHydrated || !tokens?.accessToken) return
 
-    const bootstrap = async () => {
-      if (!tokens?.accessToken) return
-      try {
-        const user = await authService.getMe()
-        setUser(user)
-      } catch {
-        clearAuth()
-      }
-    }
-
-    bootstrap()
+    authService.getMe().then(setUser).catch(clearAuth)
   }, [isHydrated, tokens?.accessToken, setUser, clearAuth])
-
-  useEffect(() => {
-    const unsub = useAuthStore.persist.onFinishHydration(() => {
-      setHydrated()
-    })
-    if (useAuthStore.persist.hasHydrated()) {
-      setHydrated()
-    }
-    return unsub
-  }, [setHydrated])
 
   return <>{children}</>
 }

@@ -1,5 +1,7 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import type { IAuthTokens } from '@eventhub/shared'
 import { env } from '@/config/env'
+import { refreshSession } from '@/lib/api/refreshSession'
 import { useAuthStore } from '@/store/slices/authStore'
 
 export const apiClient = axios.create({
@@ -16,23 +18,11 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config
 })
 
-let isRefreshing = false
-let refreshQueue: Array<{
-  resolve: (token: string) => void
-  reject: (error: unknown) => void
-}> = []
-
-const processQueue = (error: unknown, token: string | null = null) => {
-  refreshQueue.forEach((promise) => {
-    if (error) promise.reject(error)
-    else if (token) promise.resolve(token)
-  })
-  refreshQueue = []
-}
+let refreshPromise: Promise<IAuthTokens> | null = null
 
 apiClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError<{ message?: string }>) => {
+  async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean
     }
@@ -47,40 +37,26 @@ apiClient.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        refreshQueue.push({
-          resolve: (token: string) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
-            resolve(apiClient(originalRequest))
-          },
-          reject,
-        })
-      })
-    }
-
     originalRequest._retry = true
-    isRefreshing = true
 
     try {
-      const { data } = await axios.post<{
-        success: boolean
-        data: { user: unknown; tokens: { accessToken: string; refreshToken: string } }
-      }>(`${env.apiBaseUrl}/auth/refresh`, {
-        refreshToken: tokens.refreshToken,
-      })
+      if (!refreshPromise) {
+        refreshPromise = refreshSession(tokens.refreshToken).then(
+          ({ user, tokens: newTokens }) => {
+            setAuth(user, newTokens)
+            return newTokens
+          },
+        ).finally(() => {
+            refreshPromise = null
+          })
+      }
 
-      const { user, tokens: newTokens } = data.data
-      setAuth(user as Parameters<typeof setAuth>[0], newTokens)
-      processQueue(null, newTokens.accessToken)
+      const newTokens = await refreshPromise
       originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`
       return apiClient(originalRequest)
     } catch (refreshError) {
-      processQueue(refreshError, null)
       clearAuth()
       return Promise.reject(refreshError)
-    } finally {
-      isRefreshing = false
     }
   },
 )

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import type { AxiosError } from 'axios'
 import { USER_ROLES, type UserRole } from '@eventhub/shared'
+import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -23,14 +23,7 @@ export function RegisterPage() {
     try {
       await register({ name, email, password, role })
     } catch (err) {
-      const axiosErr = err as AxiosError<{ message?: string; errors?: Record<string, string[]> }>
-      const msg =
-        axiosErr.response?.data?.message ??
-        Object.values(axiosErr.response?.data?.errors ?? {})
-          .flat()
-          .join(', ') ??
-        'Registration failed. Please try again.'
-      setError(msg)
+      setError(getApiErrorMessage(err, 'Registration failed. Please try again.'))
     } finally {
       setIsLoading(false)
     }

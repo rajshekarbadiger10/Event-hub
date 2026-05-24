@@ -1,13 +1,16 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
-import type { AxiosError } from 'axios'
+import { Link, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import { useAuth } from '@/hooks/auth/useAuth'
+import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
 
 export function LoginPage() {
   const { login } = useAuth()
+  const location = useLocation()
+  const returnTo = (location.state as { from?: { pathname?: string } })?.from
+    ?.pathname
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -18,10 +21,9 @@ export function LoginPage() {
     setError('')
     setIsLoading(true)
     try {
-      await login({ email, password })
+      await login({ email, password }, returnTo)
     } catch (err) {
-      const axiosErr = err as AxiosError<{ message?: string }>
-      setError(axiosErr.response?.data?.message ?? 'Login failed. Please try again.')
+      setError(getApiErrorMessage(err, 'Login failed. Please try again.'))
     } finally {
       setIsLoading(false)
     }
