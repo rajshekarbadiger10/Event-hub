@@ -9,6 +9,8 @@ import { GuestOnlyRoute } from './GuestOnlyRoute'
 import { HomePage } from '@/pages/public/HomePage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { RegisterPage } from '@/pages/auth/RegisterPage'
+import { VendorsPage } from '@/pages/public/VendorsPage'
+import { VendorDetailsPage } from '@/pages/public/VendorDetailsPage'
 import { CustomerDashboardPage } from '@/pages/customer/CustomerDashboardPage'
 import { VendorDashboardPage } from '@/pages/vendor/VendorDashboardPage'
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage'
@@ -22,6 +24,8 @@ export function AppRouter() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="vendors" element={<VendorsPage />} />
+          <Route path="vendors/:vendorId" element={<VendorDetailsPage />} />
         </Route>
 
         <Route element={<GuestOnlyRoute />}>
