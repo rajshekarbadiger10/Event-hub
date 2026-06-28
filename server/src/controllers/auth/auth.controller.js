@@ -36,3 +36,14 @@ export const getMe = asyncHandler(async (req, res) => {
   const user = await authService.getUserById(req.user.id)
   sendSuccess(res, { message: 'Profile fetched', data: { user } })
 })
+
+export const updateMe = asyncHandler(async (req, res) => {
+  const user = await authService.updateUser(req.user.id, req.body)
+  sendSuccess(res, { message: 'Profile updated', data: { user } })
+})
+
+export const changePassword = asyncHandler(async (req, res) => {
+  await authService.changePassword(req.user.id, req.body.currentPassword, req.body.newPassword)
+  sendSuccess(res, { message: 'Password changed', data: null })
+})
+

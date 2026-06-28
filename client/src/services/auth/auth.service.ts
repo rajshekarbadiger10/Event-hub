@@ -36,4 +36,13 @@ export const authService = {
     >('/auth/me')
     return data.data.user
   },
+
+  updateProfile: async (payload: { name?: string; phone?: string }) => {
+    const { data } = await apiClient.put<IApiSuccessResponse<{ user: IUserPublic }>>('/auth/me', payload)
+    return data.data.user
+  },
+
+  changePassword: async (payload: { currentPassword: string; newPassword: string }) => {
+    await apiClient.put('/auth/change-password', payload)
+  },
 }

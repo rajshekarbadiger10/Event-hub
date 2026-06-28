@@ -97,3 +97,24 @@ export const getUserById = async (userId) => {
   }
   return user.toPublicJSON()
 }
+
+export const updateUser = async (userId, updates) => {
+  const user = await User.findById(userId)
+  if (!user) throw new AppError('User not found', 404)
+  const allowed = ['name', 'phone']
+  for (const f of allowed) {
+    if (updates[f] !== undefined) user[f] = updates[f]
+  }
+  await user.save()
+  return user.toPublicJSON()
+}
+
+export const changePassword = async (userId, currentPassword, newPassword) => {
+  const user = await User.findById(userId).select('+password')
+  if (!user) throw new AppError('User not found', 404)
+  if (!(await user.comparePassword(currentPassword))) {
+    throw new AppError('Current password is incorrect', 400)
+  }
+  user.password = newPassword
+  await user.save()
+}

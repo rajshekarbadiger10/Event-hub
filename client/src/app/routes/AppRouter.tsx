@@ -10,6 +10,11 @@ import { HomePage } from '@/pages/public/HomePage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { RegisterPage } from '@/pages/auth/RegisterPage'
 import { CustomerDashboardPage } from '@/pages/customer/CustomerDashboardPage'
+import { CustomerBookingsPage } from '@/pages/customer/CustomerBookingsPage'
+import { CustomerBookingDetailPage } from '@/pages/customer/CustomerBookingDetailPage'
+import { CustomerVendorsPage } from '@/pages/customer/CustomerVendorsPage'
+import { CustomerVendorDetailPage } from '@/pages/customer/CustomerVendorDetailPage'
+import { CustomerProfilePage } from '@/pages/customer/CustomerProfilePage'
 import { VendorDashboardPage } from '@/pages/vendor/VendorDashboardPage'
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage'
 import { NotFoundPage } from '@/pages/errors/NotFoundPage'
@@ -36,6 +41,11 @@ export function AppRouter() {
           <Route element={<DashboardLayout />}>
             <Route element={<RoleGuard allowedRoles={[USER_ROLES.CUSTOMER]} />}>
               <Route path="customer/dashboard" element={<CustomerDashboardPage />} />
+              <Route path="customer/bookings" element={<CustomerBookingsPage />} />
+              <Route path="customer/bookings/:bookingId" element={<CustomerBookingDetailPage />} />
+              <Route path="customer/vendors" element={<CustomerVendorsPage />} />
+              <Route path="customer/vendors/:vendorId" element={<CustomerVendorDetailPage />} />
+              <Route path="customer/profile" element={<CustomerProfilePage />} />
             </Route>
             <Route element={<RoleGuard allowedRoles={[USER_ROLES.VENDOR]} />}>
               <Route path="vendor/dashboard" element={<VendorDashboardPage />} />
